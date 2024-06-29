@@ -22,8 +22,12 @@ switch ($_GET['page']) {
         include 'view/master/invoice_utama.php';
         break;
 
+    case "buat-invoice":
+        include 'view/master/create-invoice.php';
+        break;
+
     case "view-detail":
-        include 'view/master/view_detail.php';
+        include 'view/master/view-detail.php';
         break;
 
     case "exit":

@@ -61,9 +61,7 @@ if (empty($_SESSION['nama'])) {
 
             </div>
             <!---Container Fluid-->
-            <!-- Footer -->
-            <?php include ('./view/index/footer.php') ?>
-            <!-- Footer -->
+
         </div>
     </div>
 

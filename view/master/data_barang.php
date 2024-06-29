@@ -5,14 +5,50 @@ function ribuan($nilai)
 {
     return number_format($nilai, 0, ',', '.');
 }
-?>
 
+if (isset($_POST['editBarang'])) {
+    $id_barang = $_POST['ID_Barang'];
+    $nama_barang = $_POST['Nama_Barang'];
+    $harga_barang = $_POST['Harga_Barang'];
+    $stock_barang = $_POST['Stock_Barang'];
+
+    // Ambil jumlah barang dari tabel detail transaksi
+    $queryJumlahBarang = "SELECT SUM(Jumlah_Barang) as total_jumlah FROM tabel_detail_transaksi WHERE Id_Barang = '$id_barang'";
+    $hasilJumlahBarang = mysqli_query($koneksi, $queryJumlahBarang);
+    $dataJumlahBarang = mysqli_fetch_assoc($hasilJumlahBarang);
+    $total_jumlah_barang = $dataJumlahBarang['total_jumlah'];
+
+    // Kurangi stok barang
+    $stock_barang -= $total_jumlah_barang;
+
+    // Update stok barang di tabel barang
+    $queryUpdateStock = "UPDATE tabel_barang SET Stock = '$stock_barang', Nama_Barang = '$nama_barang', Harga = '$harga_barang' WHERE Id_Barang = '$id_barang'";
+    mysqli_query($koneksi, $queryUpdateStock);
+}
+
+// Proses Hapus Barang
+if (isset($_POST['hapusBarang'])) {
+    $id_barang = $_POST['ID_Barang'];
+    $queryDelete = "DELETE FROM tabel_barang WHERE Id_Barang = '$id_barang'";
+    mysqli_query($koneksi, $queryDelete);
+}
+
+// Proses Tambah Barang
+if (isset($_POST['tambahBarang'])) {
+    $id_barang = $_POST['ID_Barang'];
+    $nama_barang = $_POST['Nama_Barang'];
+    $harga_barang = $_POST['Harga_Barang'];
+    $stock_barang = $_POST['Stock_Barang'];
+    $queryInsert = "INSERT INTO tabel_barang (Id_Barang, Nama_Barang, Harga, Stock) VALUES ('$id_barang', '$nama_barang', '$harga_barang', '$stock_barang')";
+    mysqli_query($koneksi, $queryInsert);
+}
+?>
 
 <div class="container-fluid" id="container-wrapper">
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800 pl-2">Data Barang</h1>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="./">Rahyu Komputer</a></li>
+            <li class="breadcrumb-item"><a href="index.php?page=home">Rahyu Komputer</a></li>
             <li class="breadcrumb-item active" aria-current="page">Data Barang</li>
         </ol>
     </div>
@@ -33,108 +69,104 @@ function ribuan($nilai)
                             <th>Harga Barang</th>
                             <th>Stock</th>
                             <th>Aksi</th>
-
                         </tr>
                     </thead>
-
                     <tbody>
                         <?php
                         $hasil = mysqli_query($koneksi, "SELECT * FROM tabel_barang ORDER BY Id_Barang ASC");
                         while ($data = mysqli_fetch_assoc($hasil)) {
                             $id = $data['Id_Barang'];
                             ?>
-                            <tr>
-                                <td><?= $data['Nama_Barang'] ?></td>
-                                <td>Rp. <?= ribuan($data['Harga']) ?></td>
-                                <td><?= $data['Stock'] ?></td>
-                                <td>
-                                    <a href="#" class="btn btn-info btn-sm" data-toggle="modal"
-                                        data-target="#edit<?= $id; ?>">
-                                        <i class="fas fa-pen"></i>
-                                    </a>
-                                    <a href="#" class="btn btn-danger btn-sm" data-toggle="modal"
-                                        data-target="#delete<?= $id; ?>">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td><?= $data['Nama_Barang'] ?></td>
+                            <td>Rp. <?= ribuan($data['Harga']) ?></td>
+                            <td><?= $data['Stock'] ?></td>
+                            <td>
+                                <a href="#" class="btn btn-info btn-sm" data-toggle="modal"
+                                    data-target="#edit<?= $id; ?>">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <a href="#" class="btn btn-danger btn-sm" data-toggle="modal"
+                                    data-target="#delete<?= $id; ?>">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
 
-                            <!-- MODAL EDIT BARANG -->
-                            <div class="modal fade" id="edit<?= $id; ?>" tabindex="-1" role="dialog"
-                                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Edit Data Barang</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form method="POST">
-                                                <div class="form-group">
-                                                    <input type="hidden" class="form-control" id="ID_Barang"
-                                                        name="ID_Barang" value="<?= $id; ?>">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="Nama_Barang">Nama Barang</label>
-                                                    <input type="text" class="form-control" id="Nama_Barang"
-                                                        name="Nama_Barang" value="<?= $data['Nama_Barang'] ?>">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="Harga_Barang">Harga Barang</label>
-                                                    <input type="text" class="form-control" id="Harga_Barang"
-                                                        name="Harga_Barang" value="<?= $data['Harga'] ?>">
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="Stock_Barang">Stok Barang</label>
-                                                    <input type="text" class="form-control" id="Stock_Barang"
-                                                        name="Stock_Barang" value="<?= $data['Stock'] ?>">
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-outline-primary"
-                                                        data-dismiss="modal">Close</button>
-                                                    <input type="submit" class="btn btn-primary" name="editBarang"
-                                                        value="Simpan" />
-                                                </div>
-                                            </form>
-                                        </div>
+                        <!-- MODAL EDIT BARANG -->
+                        <div class="modal fade" id="edit<?= $id; ?>" tabindex="-1" role="dialog"
+                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Edit Data Barang</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST">
+                                            <div class="form-group">
+                                                <input type="hidden" class="form-control" id="ID_Barang"
+                                                    name="ID_Barang" value="<?= $id; ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="Nama_Barang">Nama Barang</label>
+                                                <input type="text" class="form-control" id="Nama_Barang"
+                                                    name="Nama_Barang" value="<?= $data['Nama_Barang'] ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="Harga_Barang">Harga Barang</label>
+                                                <input type="text" class="form-control" id="Harga_Barang"
+                                                    name="Harga_Barang" value="<?= $data['Harga'] ?>">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="Stock_Barang">Stok Barang</label>
+                                                <input type="text" class="form-control" id="Stock_Barang"
+                                                    name="Stock_Barang" value="<?= $data['Stock'] ?>">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-outline-primary"
+                                                    data-dismiss="modal">Close</button>
+                                                <input type="submit" class="btn btn-primary" name="editBarang"
+                                                    value="Simpan" />
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <!-- MODAL DELETE BARANG -->
-                            <div class="modal fade" id="delete<?= $id; ?>" tabindex="-1" role="dialog"
-                                aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog" role="document">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Hapus Data Barang</h5>
-                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <!--Form Hapus Barang-->
-                                            <form method="POST">
-                                                <div class="form-group">
-                                                    <p>Apakah anda yakin ingin menghapus
-                                                        <?= $data['Nama_Barang']; ?>?
-                                                        <input type="hidden" name="ID_Barang" class="form-control"
-                                                            value="<?= $id; ?>">
-
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-outline-primary"
-                                                        data-dismiss="modal">Close</button>
-                                                    <input type="submit" class="btn btn-primary" name="hapusBarang"
-                                                        value="Hapus">
-                                                </div>
-                                            </form>
-                                        </div>
+                        <!-- MODAL DELETE BARANG -->
+                        <div class="modal fade" id="delete<?= $id; ?>" tabindex="-1" role="dialog"
+                            aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Hapus Data Barang</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <!--Form Hapus Barang-->
+                                        <form method="POST">
+                                            <div class="form-group">
+                                                <p>Apakah anda yakin ingin menghapus <?= $data['Nama_Barang']; ?>?</p>
+                                                <input type="hidden" name="ID_Barang" class="form-control"
+                                                    value="<?= $id; ?>">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-outline-primary"
+                                                    data-dismiss="modal">Close</button>
+                                                <input type="submit" class="btn btn-primary" name="hapusBarang"
+                                                    value="Hapus">
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         <?php } ?>
                     </tbody>
                 </table>
@@ -175,7 +207,6 @@ function ribuan($nilai)
                             <input type="text" class="form-control" id="Stock_Barang" name="Stock_Barang"
                                 placeholder="Masukan Stok Barang">
                         </div>
-
                         <div class="modal-footer">
                             <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
                             <input type="submit" class="btn btn-primary" name="tambahBarang" value="Tambah Barang" />
@@ -185,3 +216,6 @@ function ribuan($nilai)
             </div>
         </div>
     </div>
+
+    <?php include ('./view/index/footer.php') ?>
+</div>

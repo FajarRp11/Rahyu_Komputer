@@ -11,6 +11,7 @@ if (isset($_POST['login'])) {
         session_start();
         $_SESSION['log'] = 'true';
         $_SESSION['nama'] = $result['Nama_Kasir'];
+        $_SESSION['ID_Kasir'] = $result['Id_Kasir'];
         header('location: index.php?page=home');
     } else {
         header('location: login.php');

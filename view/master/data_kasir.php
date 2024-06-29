@@ -8,7 +8,7 @@ include ('models/proses_kasir.php');
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800 pl-2">Data Kasir</h1>
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="./">Rahyu Komputer</a></li>
+            <li class="breadcrumb-item"><a href="index.php?page=home">Rahyu Komputer</a></li>
             <li class="breadcrumb-item active" aria-current="page">Data Kasir</li>
         </ol>
     </div>
@@ -170,3 +170,5 @@ include ('models/proses_kasir.php');
         </div>
     </div>
 </div>
+
+<?php include ('./view/index/footer.php') ?>
