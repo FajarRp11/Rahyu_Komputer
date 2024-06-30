@@ -15,6 +15,49 @@ $queryTampilInvoice =
                             ORDER BY tht.Id_Invoice ASC";
 $hasilTampil = mysqli_query($koneksi, $queryTampilInvoice);
 
+if (isset($_POST['hapusInvoice'])) {
+    $Id_Invoice = $_POST['Id_Invoice'];
+
+    // Mulai transaksi
+    mysqli_begin_transaction($koneksi);
+
+    try {
+        // Hapus data dari tabel_detail_transaksi
+        $queryDetail = "DELETE FROM `tabel_detail_transaksi` WHERE Id_Invoice = '$Id_Invoice'";
+        mysqli_query($koneksi, $queryDetail);
+
+        // Hapus data dari tabel_header_transaksi
+        $queryHeader = "DELETE FROM `tabel_header_transaksi` WHERE Id_Invoice = '$Id_Invoice'";
+        mysqli_query($koneksi, $queryHeader);
+
+        // Commit transaksi
+        mysqli_commit($koneksi);
+
+        ?>
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h6><i class="fas fa-check"></i><b> Data Terhapus !</b></h6>
+        </div>
+        <?php
+        header('location:index.php?page=barang');
+    } catch (Exception $e) {
+        // Rollback transaksi jika terjadi kesalahan
+        mysqli_rollback($koneksi);
+
+        ?>
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h6><i class="fas fa-ban"></i><b> Gagal!</b></h6>
+        </div>
+        <?php
+        header('location:index.php?page=barang');
+    }
+}
+
 ?>
 
 <div class="container-fluid" id="container-wrapper">
@@ -75,7 +118,7 @@ $hasilTampil = mysqli_query($koneksi, $queryTampilInvoice);
                                 <div class="modal-dialog" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Hapus Data Customer</h5>
+                                            <h5 class="modal-title" id="exampleModalLabel">Hapus Data Invoice</h5>
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
@@ -85,15 +128,14 @@ $hasilTampil = mysqli_query($koneksi, $queryTampilInvoice);
                                             <form method="POST">
                                                 <div class="form-group">
                                                     <p>Apakah anda yakin ingin menghapus
-                                                        <?= $data['Nama_Customer']; ?>?
-                                                        <input type="hidden" name="ID_Customer" class="form-control"
+                                                        <?= $data['Id_Invoice']; ?>?
+                                                        <input type="hidden" name="Id_Invoice" class="form-control"
                                                             value="<?= $id; ?>">
-
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="submit" class="btn btn-outline-primary"
                                                         data-dismiss="modal">Close</button>
-                                                    <input type="submit" class="btn btn-primary" name="hapusCustomer"
+                                                    <input type="submit" class="btn btn-primary" name="hapusInvoice"
                                                         value="Hapus">
                                                 </div>
                                             </form>
@@ -107,8 +149,6 @@ $hasilTampil = mysqli_query($koneksi, $queryTampilInvoice);
             </div>
         </div>
     </div>
-
-
 </div>
 
 <?php include ('./view/index/footer.php') ?>

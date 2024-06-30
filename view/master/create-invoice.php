@@ -8,9 +8,79 @@ $ambilCustomer = mysqli_query($koneksi, "SELECT * FROM tabel_customer ORDER BY I
 $ambilKasir = mysqli_query($koneksi, "SELECT * FROM tabel_kasir WHERE Id_Kasir = '$ID_Kasir'");
 $ambilBarang = mysqli_query($koneksi, "SELECT * FROM tabel_barang ORDER BY Id_Barang");
 $dataKasir = mysqli_fetch_assoc($ambilKasir);
+$tanggalSekarang = date('Y-m-d');
+
+// Function for formatting number to Indonesian Rupiah
 function ribuan($nilai)
 {
     return number_format($nilai, 0, ',', '.');
+}
+
+if (isset($_POST['buatInvoice'])) {
+    // Ambil data dari form
+    $ID_Invoice = $_POST['ID_Invoice'];
+    $Tanggal = $_POST['Tanggal'];
+    $ID_Customer = $_POST['ID_Customer'];
+    $Jumlah_Bayar = $_POST['Jumlah_Bayar'];
+
+    // Simpan ke tabel_header_transaksi
+    $queryInsertHeader = "INSERT INTO tabel_header_transaksi (Id_Invoice, Tanggal, Id_Customer, Id_Kasir)
+                          VALUES ('$ID_Invoice', '$Tanggal', '$ID_Customer', '$ID_Kasir')";
+    $insertHeader = mysqli_query($koneksi, $queryInsertHeader);
+
+    if ($insertHeader) {
+        // Simpan ke tabel_detail_transaksi untuk setiap barang
+        $rowCount = count($_POST['ID_Barang']);
+        $success = true;
+
+        for ($i = 0; $i < $rowCount; $i++) {
+            $ID_Barang = $_POST['ID_Barang'][$i];
+            $Jumlah_Barang = $_POST['Jumlah_Barang'][$i];
+            $Harga_Barang = $_POST['Harga_Barang'][$i]; // Optional, depending on your structure
+
+            // Simpan ke tabel_detail_transaksi
+            $queryInsertDetail = "INSERT INTO tabel_detail_transaksi (Id_Invoice, Id_Barang, Jumlah_Barang, Jumlah_Bayar)
+                                  VALUES ('$ID_Invoice', '$ID_Barang', '$Jumlah_Barang', '$Jumlah_Bayar')";
+            $insertDetail = mysqli_query($koneksi, $queryInsertDetail);
+
+            if (!$insertDetail) {
+                $success = false;
+                break; // Stop loop if one insertion fails
+            }
+        }
+
+        if ($success) {
+            ?>
+<div class="alert alert-success alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h6><i class="fas fa-check"></i><b> Invoice berhasil dibuat dan disimpan!</b></h6>
+</div>
+<?php
+            // Redirect or display success message as needed
+        } else {
+            ?>
+<div class="alert alert-danger alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h6><i class="fas fa-ban"></i><b> Gagal menyimpan data detail transaksi.</b></h6>
+</div>
+<?php
+            // Handle failure scenario
+        }
+    } else {
+        ?>
+<div class="alert alert-danger alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+    <h6><i class="fas fa-ban"></i><b> Gagal menyimpan data header transaksi.</b></h6>
+</div>
+<?php
+        // Handle failure scenario
+    }
 }
 ?>
 
@@ -24,9 +94,16 @@ function ribuan($nilai)
         </ol>
     </div>
 
-    <div class="form-group">
-        <label for="ID_Invoice">ID Invoice</label>
-        <input type="text" class="form-control" id="ID_Invoice" name="ID_Invoice">
+    <div class="row">
+        <div class="form-group col-6">
+            <label for="ID_Invoice">ID Invoice</label>
+            <input type="text" class="form-control" id="ID_Invoice" name="ID_Invoice">
+        </div>
+        <div class="form-group col-6">
+            <label for="ID_Invoice">Tanggal</label>
+            <input type="text" class="form-control" id="Tanggal" name="Tanggal" readonly
+                value="<?= $tanggalSekarang ?>">
+        </div>
     </div>
 
     <div class="row">
@@ -140,8 +217,9 @@ function ribuan($nilai)
         <input type="text" class="form-control" id="Jumlah_Bayar" name="Jumlah_Bayar">
     </div>
     <div class="d-flex justify-content-end">
-        <strong>Total : <span>0</span></strong>
+        <strong>Total : Rp. <span class="total-harga">0</span></strong>
     </div>
+
     <input type="submit" class="btn btn-primary mb-2" name="buatInvoice" value="Buat Invoice" />
 
     <!-- MODAL PILIH CUSTOMER -->
@@ -167,20 +245,20 @@ function ribuan($nilai)
                         </thead>
                         <tbody>
                             <?php while ($data = mysqli_fetch_assoc($ambilCustomer)): ?>
-                                <tr>
-                                    <td><?= $data['Nama_Customer'] ?></td>
-                                    <td><?= $data['Telepon_Customer'] ?></td>
-                                    <td><?= $data['Alamat_Customer'] ?></td>
-                                    <td>
-                                        <a href="#" class="btn btn-primary pilihCustomer"
-                                            data-id-customer="<?= $data['Id_Customer'] ?>"
-                                            data-nama-customer="<?= $data['Nama_Customer'] ?>"
-                                            data-telepon-customer="<?= $data['Telepon_Customer'] ?>"
-                                            data-alamat-customer="<?= $data['Alamat_Customer'] ?>" data-dismiss="modal">
-                                            Pilih
-                                        </a>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td><?= $data['Nama_Customer'] ?></td>
+                                <td><?= $data['Telepon_Customer'] ?></td>
+                                <td><?= $data['Alamat_Customer'] ?></td>
+                                <td>
+                                    <a href="#" class="btn btn-primary pilihCustomer"
+                                        data-id-customer="<?= $data['Id_Customer'] ?>"
+                                        data-nama-customer="<?= $data['Nama_Customer'] ?>"
+                                        data-telepon-customer="<?= $data['Telepon_Customer'] ?>"
+                                        data-alamat-customer="<?= $data['Alamat_Customer'] ?>" data-dismiss="modal">
+                                        Pilih
+                                    </a>
+                                </td>
+                            </tr>
                             <?php endwhile ?>
                         </tbody>
                     </table>
@@ -211,18 +289,18 @@ function ribuan($nilai)
                         </thead>
                         <tbody>
                             <?php while ($data = mysqli_fetch_assoc($ambilBarang)): ?>
-                                <tr>
-                                    <td><?= $data['Nama_Barang'] ?></td>
-                                    <td>Rp. <?= ribuan($data['Harga']) ?></td>
-                                    <td>
-                                        <a href="#" class="btn btn-primary pilihBarang"
-                                            data-id-barang="<?= $data['Id_Barang'] ?>"
-                                            data-nama-barang="<?= $data['Nama_Barang'] ?>"
-                                            data-harga-barang="<?= $data['Harga'] ?>" data-dismiss="modal">
-                                            Pilih
-                                        </a>
-                                    </td>
-                                </tr>
+                            <tr>
+                                <td><?= $data['Nama_Barang'] ?></td>
+                                <td>Rp. <?= ribuan($data['Harga']) ?></td>
+                                <td>
+                                    <a href="#" class="btn btn-primary pilihBarang"
+                                        data-id-barang="<?= $data['Id_Barang'] ?>"
+                                        data-nama-barang="<?= $data['Nama_Barang'] ?>"
+                                        data-harga-barang="<?= $data['Harga'] ?>" data-dismiss="modal">
+                                        Pilih
+                                    </a>
+                                </td>
+                            </tr>
                             <?php endwhile ?>
                         </tbody>
                     </table>
@@ -233,77 +311,108 @@ function ribuan($nilai)
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        function updateSubtotal(row) {
-            let jumlah = row.querySelector('.jumlah-barang').value;
-            let harga = parseFloat(row.querySelector('.harga-barang').value);
-            if (!isNaN(harga) && !isNaN(jumlah)) {
-                row.querySelector('.subtotal-barang').value = (jumlah * harga).toFixed(2);
+document.addEventListener('DOMContentLoaded', function() {
+    function formatRupiah(angka) {
+        let number_string = angka.toString(),
+            sisa = number_string.length % 3,
+            rupiah = number_string.substr(0, sisa),
+            ribuan = number_string.substr(sisa).match(/\d{3}/g);
+
+        if (ribuan) {
+            let separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+
+        return rupiah;
+    }
+
+    function updateSubtotal(row) {
+        let jumlah = row.querySelector('.jumlah-barang').value;
+        let harga = parseFloat(row.querySelector('.harga-barang').getAttribute('data-value'));
+        if (!isNaN(harga) && !isNaN(jumlah)) {
+            let subtotal = (jumlah * harga).toFixed(2);
+            row.querySelector('.subtotal-barang').value = formatRupiah(subtotal);
+            row.querySelector('.subtotal-barang').setAttribute('data-value', subtotal);
+            updateTotal();
+        }
+    }
+
+    function updateTotal() {
+        let total = 0;
+        document.querySelectorAll('.subtotal-barang').forEach(function(input) {
+            let subtotal = parseFloat(input.getAttribute('data-value'));
+            if (!isNaN(subtotal)) {
+                total += subtotal;
             }
-        }
+        });
+        document.querySelector('.total-harga').textContent = formatRupiah(total.toFixed(2));
+    }
 
-        function addRowListeners(row) {
-            row.querySelector('.jumlah-barang').addEventListener('input', function () {
-                updateSubtotal(row);
-            });
-
-            row.querySelector('.remove-row').addEventListener('click', function (e) {
-                e.preventDefault();
-                row.remove();
-            });
-
-            row.querySelector('.pilih-produk').addEventListener('click', function () {
-                document.querySelectorAll('tr').forEach(function (tr) {
-                    tr.classList.remove('selected-row');
-                });
-                row.classList.add('selected-row');
-            });
-        }
-
-        document.querySelectorAll('.pilihCustomer').forEach(function (button) {
-            button.addEventListener('click', function () {
-                let idCustomer = this.getAttribute('data-id-customer');
-                let nama = this.getAttribute('data-nama-customer');
-                let telepon = this.getAttribute('data-telepon-customer');
-                let alamat = this.getAttribute('data-alamat-customer');
-
-                document.getElementById('ID_Customer').value = idCustomer;
-                document.getElementById('Nama_Customer').value = nama;
-                document.getElementById('Telepon_Customer').value = telepon;
-                document.getElementById('Alamat_Customer').value = alamat;
-            });
+    function addRowListeners(row) {
+        row.querySelector('.jumlah-barang').addEventListener('input', function() {
+            updateSubtotal(row);
         });
 
-        document.querySelectorAll('.pilihBarang').forEach(function (button) {
-            button.addEventListener('click', function () {
-                let namaBarang = this.getAttribute('data-nama-barang');
-                let hargaBarang = this.getAttribute('data-harga-barang');
-                let selectedRow = document.querySelector('.selected-row');
-
-                if (selectedRow) {
-                    selectedRow.querySelector('.nama-barang').value = namaBarang;
-                    selectedRow.querySelector('.harga-barang').value = hargaBarang;
-                    updateSubtotal(selectedRow);
-                    selectedRow.classList.remove('selected-row');
-                }
-            });
-        });
-
-        document.querySelectorAll('.pilih-produk').forEach(function (button) {
-            button.addEventListener('click', function () {
-                let row = this.closest('tr');
-                document.querySelectorAll('tr').forEach(function (tr) {
-                    tr.classList.remove('selected-row');
-                });
-                row.classList.add('selected-row');
-            });
-        });
-
-        document.querySelector('.add-row').addEventListener('click', function (e) {
+        row.querySelector('.remove-row').addEventListener('click', function(e) {
             e.preventDefault();
-            let table = document.getElementById('tabelBarang').getElementsByTagName('tbody')[0];
-            let newRow = table.insertRow();
-            newRow.innerHTML = `<tr>
+            row.remove();
+            updateTotal();
+        });
+
+        row.querySelector('.pilih-produk').addEventListener('click', function() {
+            document.querySelectorAll('tr').forEach(function(tr) {
+                tr.classList.remove('selected-row');
+            });
+            row.classList.add('selected-row');
+        });
+    }
+
+    document.querySelectorAll('.pilihCustomer').forEach(function(button) {
+        button.addEventListener('click', function() {
+            let idCustomer = this.getAttribute('data-id-customer');
+            let nama = this.getAttribute('data-nama-customer');
+            let telepon = this.getAttribute('data-telepon-customer');
+            let alamat = this.getAttribute('data-alamat-customer');
+
+            document.getElementById('ID_Customer').value = idCustomer;
+            document.getElementById('Nama_Customer').value = nama;
+            document.getElementById('Telepon_Customer').value = telepon;
+            document.getElementById('Alamat_Customer').value = alamat;
+        });
+    });
+
+    document.querySelectorAll('.pilihBarang').forEach(function(button) {
+        button.addEventListener('click', function() {
+            let namaBarang = this.getAttribute('data-nama-barang');
+            let hargaBarang = this.getAttribute('data-harga-barang');
+            let selectedRow = document.querySelector('.selected-row');
+
+            if (selectedRow) {
+                selectedRow.querySelector('.nama-barang').value = namaBarang;
+                selectedRow.querySelector('.harga-barang').value = formatRupiah(hargaBarang);
+                selectedRow.querySelector('.harga-barang').setAttribute('data-value',
+                    hargaBarang);
+                updateSubtotal(selectedRow);
+                selectedRow.classList.remove('selected-row');
+            }
+        });
+    });
+
+    document.querySelectorAll('.pilih-produk').forEach(function(button) {
+        button.addEventListener('click', function() {
+            let row = this.closest('tr');
+            document.querySelectorAll('tr').forEach(function(tr) {
+                tr.classList.remove('selected-row');
+            });
+            row.classList.add('selected-row');
+        });
+    });
+
+    document.querySelector('.add-row').addEventListener('click', function(e) {
+        e.preventDefault();
+        let table = document.getElementById('tabelBarang').getElementsByTagName('tbody')[0];
+        let newRow = table.insertRow();
+        newRow.innerHTML = `<tr>
                                     <td>
                                         <div class="form-group row">
                                             <div class="col-1">
@@ -332,11 +441,11 @@ function ribuan($nilai)
                                     </td>
                                 </tr>`;
 
-            addRowListeners(newRow);
-        });
-
-        document.querySelectorAll('#tabelBarang tbody tr').forEach(function (row) {
-            addRowListeners(row);
-        });
+        addRowListeners(newRow);
     });
+
+    document.querySelectorAll('#tabelBarang tbody tr').forEach(function(row) {
+        addRowListeners(row);
+    });
+});
 </script>
