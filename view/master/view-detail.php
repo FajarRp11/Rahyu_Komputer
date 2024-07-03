@@ -10,14 +10,14 @@ function ribuan($nilai)
     return number_format($nilai, 0, ',', '.');
 }
 
-$queryDetail = "SELECT tht.*, tdt.*, tc.*, tk.*, tb.* 
-                FROM tabel_header_transaksi tht
-                JOIN tabel_detail_transaksi tdt ON tht.Id_Invoice = tdt.Id_Invoice
-                JOIN tabel_barang tb ON tb.Id_Barang = tdt.Id_Barang
-                JOIN tabel_customer tc ON tht.Id_Customer = tc.Id_Customer 
-                JOIN tabel_kasir tk ON tht.Id_Kasir = tk.Id_Kasir
-                WHERE tht.Id_Invoice = '$getID'
-                ORDER BY tht.Id_Invoice ASC";
+$queryDetail = "SELECT th.*, td.*, tp.*, tk.*, tm.* 
+                FROM header th
+                JOIN detail td ON th.ID_INV = td.ID_INV
+                JOIN menu tm ON td.ID_Item = tm.ID_Item 
+                JOIN pelanggan tp ON tp.ID_Pelanggan = th.ID_Pelanggan  
+                JOIN kasir tk ON tk.ID_Kasir = th.ID_Kasir
+                WHERE th.ID_INV = '$getID'
+                ORDER BY th.ID_INV ASC";
 $hasilDetail = mysqli_query($koneksi, $queryDetail);
 
 $cekHeader = mysqli_query($koneksi, "SELECT tht.*, tc.*, tk.* FROM 
@@ -76,13 +76,13 @@ $tanggal_id = $tanggal_obj->format('Ymd');
                     $jumlahBayar = $dataHeader['Jumlah_Bayar'];
                     ?>
 
-                <tr>
-                    <td style="border: 1px solid #dee2e6;"><?= $no++ ?></td>
-                    <td style="border: 1px solid #dee2e6;"><?= $detailInvoice['Nama_Barang'] ?></td>
-                    <td style="border: 1px solid #dee2e6;"><?= $detailInvoice['Jumlah_Barang'] ?></td>
-                    <td style="border: 1px solid #dee2e6;">Rp. <?= ribuan($detailInvoice['Harga']) ?></td>
-                    <td style="border: 1px solid #dee2e6;">Rp. <?= ribuan($subtotal) ?></td>
-                </tr>
+                    <tr>
+                        <td style="border: 1px solid #dee2e6;"><?= $no++ ?></td>
+                        <td style="border: 1px solid #dee2e6;"><?= $detailInvoice['Nama_Barang'] ?></td>
+                        <td style="border: 1px solid #dee2e6;"><?= $detailInvoice['Jumlah_Barang'] ?></td>
+                        <td style="border: 1px solid #dee2e6;">Rp. <?= ribuan($detailInvoice['Harga']) ?></td>
+                        <td style="border: 1px solid #dee2e6;">Rp. <?= ribuan($subtotal) ?></td>
+                    </tr>
                 <?php } ?>
             </tbody>
             <tr>
