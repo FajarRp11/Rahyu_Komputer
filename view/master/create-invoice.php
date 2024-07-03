@@ -34,6 +34,7 @@ if (isset($_POST['buatInvoice'])) {
         $success = true;
 
         for ($i = 0; $i < $rowCount; $i++) {
+            $ID_Invoice = $_POST['ID_Invoice'];
             $ID_Barang = $_POST['ID_Barang'][$i];
             $Jumlah_Barang = $_POST['Jumlah_Barang'][$i];
 
@@ -44,6 +45,8 @@ if (isset($_POST['buatInvoice'])) {
 
             if (!$insertDetail) {
                 $success = false;
+                // Display SQL error for debugging
+                echo "Error: " . mysqli_error($koneksi);
                 break; // Stop loop if one insertion fails
             }
         }
@@ -57,7 +60,6 @@ if (isset($_POST['buatInvoice'])) {
     <h6><i class="fas fa-check"></i><b> Invoice berhasil dibuat dan disimpan!</b></h6>
 </div>
 <?php
-            // Redirect or display success message as needed
         } else {
             ?>
 <div class="alert alert-danger alert-dismissible" role="alert">
@@ -67,7 +69,6 @@ if (isset($_POST['buatInvoice'])) {
     <h6><i class="fas fa-ban"></i><b> Gagal menyimpan data detail transaksi.</b></h6>
 </div>
 <?php
-            // Handle failure scenario
         }
     } else {
         ?>
@@ -78,9 +79,9 @@ if (isset($_POST['buatInvoice'])) {
     <h6><i class="fas fa-ban"></i><b> Gagal menyimpan data header transaksi.</b></h6>
 </div>
 <?php
-        // Handle failure scenario
     }
 }
+
 ?>
 
 
@@ -203,7 +204,7 @@ if (isset($_POST['buatInvoice'])) {
                     </td>
                     <td>
                         <input type="hidden" class="form-control id-barang" name="ID_Barang[]">
-                        <input type="number" class="form-control jumlah-barang" name="jumlah-barang[]" value="1">
+                        <input type="number" class="form-control jumlah-barang" name="Jumlah_Barang[]" value="1">
                     </td>
                     <td>
                         <input type="text" class="form-control harga-barang" readonly>
