@@ -10,7 +10,7 @@ function ribuan($nilai)
     return number_format($nilai, 0, ',', '.');
 }
 
-$queryDetail = "SELECT tht.*, tdt.*, tc.*, tk.*, tb.*, tdt.Jumlah_Bayar  
+$queryDetail = "SELECT tht.*, tdt.*, tc.*, tk.*, tb.* 
                 FROM tabel_header_transaksi tht
                 JOIN tabel_detail_transaksi tdt ON tht.Id_Invoice = tdt.Id_Invoice
                 JOIN tabel_barang tb ON tb.Id_Barang = tdt.Id_Barang
@@ -27,6 +27,10 @@ $cekHeader = mysqli_query($koneksi, "SELECT tht.*, tc.*, tk.* FROM
                                     WHERE tht.Id_Invoice = '$getID'");
 $dataHeader = mysqli_fetch_assoc($cekHeader);
 
+
+$tanggal_obj = DateTime::createFromFormat('Y-m-d', $dataHeader['Tanggal']);
+$tanggal_id = $tanggal_obj->format('Ymd');
+
 ?>
 <!-- Container Fluid-->
 <div class="container-fluid" id="container-wrapper">
@@ -40,7 +44,7 @@ $dataHeader = mysqli_fetch_assoc($cekHeader);
 
     <div class="row">
         <div class="col-sm-6">
-            <h6 class="mb-1"><strong>Invoice : <?= $dataHeader['Id_Invoice'] ?> </strong></h6>
+            <h6 class="mb-1"><strong>Invoice : <?= $tanggal_id ?>/<?= $dataHeader['Id_Invoice'] ?>/INV</strong></h6>
             <p class=" mb-0">Tanggal : <?= $dataHeader['Tanggal'] ?></p>
             <p class=" mb-0">Kasir : <?= $dataHeader['Nama_Kasir'] ?></p>
         </div>
@@ -69,43 +73,43 @@ $dataHeader = mysqli_fetch_assoc($cekHeader);
                 while ($detailInvoice = mysqli_fetch_array($hasilDetail)) {
                     $subtotal = $detailInvoice['Jumlah_Barang'] * $detailInvoice['Harga'];
                     $totalKeseluruhan += $subtotal;
-                    $jumlahBayar = $detailInvoice['Jumlah_Bayar'];
+                    $jumlahBayar = $dataHeader['Jumlah_Bayar'];
                     ?>
 
-                    <tr>
-                        <td style="border: 1px solid #dee2e6;"><?= $no++ ?></td>
-                        <td style="border: 1px solid #dee2e6;"><?= $detailInvoice['Nama_Barang'] ?></td>
-                        <td style="border: 1px solid #dee2e6;"><?= $detailInvoice['Jumlah_Barang'] ?></td>
-                        <td style="border: 1px solid #dee2e6;">Rp. <?= ribuan($detailInvoice['Harga']) ?></td>
-                        <td style="border: 1px solid #dee2e6;">Rp. <?= ribuan($subtotal) ?></td>
-                    </tr>
+                <tr>
+                    <td style="border: 1px solid #dee2e6;"><?= $no++ ?></td>
+                    <td style="border: 1px solid #dee2e6;"><?= $detailInvoice['Nama_Barang'] ?></td>
+                    <td style="border: 1px solid #dee2e6;"><?= $detailInvoice['Jumlah_Barang'] ?></td>
+                    <td style="border: 1px solid #dee2e6;">Rp. <?= ribuan($detailInvoice['Harga']) ?></td>
+                    <td style="border: 1px solid #dee2e6;">Rp. <?= ribuan($subtotal) ?></td>
+                </tr>
                 <?php } ?>
             </tbody>
-
             <tr>
                 <th class="d-none d-md-block border-0 bg-white"></th>
                 <th class="border-0 bg-white"></th>
                 <th class="border-0 bg-white"></th>
-                <th class="text-right bg-light" style="border: 1px solid #dee2e6;font-weight:600;">Total :</th>
-                <th class="bg-light" style="border: 1px solid #dee2e6;font-weight:600;">
+                <th class="text-right bg-light font-bold">Total :</th>
+                <th class="bg-light font-bold">
                     Rp. <?= ribuan($totalKeseluruhan) ?></th>
             </tr>
             <tr>
                 <th class="d-none d-md-block border-0 bg-white"></th>
                 <th class="border-0 bg-white"></th>
                 <th class="border-0 bg-white"></th>
-                <th class="text-right bg-light" style="border: 1px solid #dee2e6;font-weight:600;">Jumlah Bayar :</th>
-                <th class="bg-light" style="border: 1px solid #dee2e6;font-weight:600;">
+                <th class="text-right bg-light font-bold">Jumlah Bayar :</th>
+                <th class="bg-light font-bold">
                     Rp. <?= ribuan($jumlahBayar) ?></th>
             </tr>
             <tr>
                 <th class="d-none d-md-block border-0 bg-white"></th>
                 <th class="border-0 bg-white"></th>
                 <th class="border-0 bg-white"></th>
-                <th class="text-right bg-light" style="border: 1px solid #dee2e6;font-weight:600;">Kembali :</th>
-                <th class="bg-light" style="border: 1px solid #dee2e6;font-weight:600;">
+                <th class="text-right bg-light font-bold">Kembali :</th>
+                <th class="bg-light font-bold">
                     Rp. <?= ribuan($jumlahBayar - $totalKeseluruhan) ?></th>
             </tr>
+
         </table>
     </div>
 

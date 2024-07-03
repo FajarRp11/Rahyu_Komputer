@@ -1,6 +1,9 @@
 <ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.php?page=home">
-        <div class="sidebar-brand-text">Rahyu Komputer</div>
+        <div class="sidebar-brand-icon">
+            <i class="fa fa-laptop" aria-hidden="true"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">Rahyu Komputer</div>
     </a>
     <hr class="sidebar-divider my-0">
     <li class="nav-item">

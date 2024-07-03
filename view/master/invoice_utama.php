@@ -94,9 +94,11 @@ if (isset($_POST['hapusInvoice'])) {
                         <?php
                         while ($data = mysqli_fetch_assoc($hasilTampil)) {
                             $id = $data['Id_Invoice'];
+                            $tanggal_obj = DateTime::createFromFormat('Y-m-d', $data['Tanggal']);
+                            $tanggal_id = $tanggal_obj->format('Ymd');
                             ?>
                             <tr>
-                                <td><?= $data['Id_Invoice'] ?></td>
+                                <td><?= $tanggal_id ?>/<?= $data['Id_Invoice'] ?>/INV</td>
                                 <td><?= $data['Tanggal'] ?></td>
                                 <td><?= $data['Nama_Customer'] ?></td>
                                 <td><?= $data['Nama_Kasir'] ?></td>
