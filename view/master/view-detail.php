@@ -10,14 +10,14 @@ function ribuan($nilai)
     return number_format($nilai, 0, ',', '.');
 }
 
-$queryDetail = "SELECT th.*, td.*, tp.*, tk.*, tm.* 
-                FROM header th
-                JOIN detail td ON th.ID_INV = td.ID_INV
-                JOIN menu tm ON td.ID_Item = tm.ID_Item 
-                JOIN pelanggan tp ON tp.ID_Pelanggan = th.ID_Pelanggan  
-                JOIN kasir tk ON tk.ID_Kasir = th.ID_Kasir
-                WHERE th.ID_INV = '$getID'
-                ORDER BY th.ID_INV ASC";
+$queryDetail = "SELECT tht.*, tdt.*, tb.*, tk.*, tc.* 
+                FROM tabel_header_transaksi tht
+                JOIN tabel_detail_transaksi tdt ON tht.Id_Invoice = tdt.Id_Invoice
+                JOIN tabel_customer tc ON tc.Id_Customer = tht.Id_Customer
+                JOIN tabel_barang tb ON tb.Id_Barang = tdt.Id_Barang 
+                JOIN tabel_kasir tk ON tk.Id_Kasir = tht.Id_Kasir
+                WHERE tht.Id_Invoice = '$getID'
+                ORDER BY tht.Id_Invoice ASC";
 $hasilDetail = mysqli_query($koneksi, $queryDetail);
 
 $cekHeader = mysqli_query($koneksi, "SELECT tht.*, tc.*, tk.* FROM 
@@ -42,7 +42,7 @@ $tanggal_id = $tanggal_obj->format('Ymd');
         </a>
     </div>
 
-    <div class="row">
+    <div class="row px-3">
         <div class="col-sm-6">
             <h6 class="mb-1"><strong>Invoice : <?= $tanggal_id ?>/<?= $dataHeader['Id_Invoice'] ?>/INV</strong></h6>
             <p class=" mb-0">Tanggal : <?= $dataHeader['Tanggal'] ?></p>
