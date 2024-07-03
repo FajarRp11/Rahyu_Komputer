@@ -34,6 +34,7 @@
                 }
             });
             document.querySelector('.total-harga').textContent = formatRupiah(total.toFixed(2));
+            document.getElementById('Jumlah_Bayar').value = formatRupiah(total.toFixed(2));
         }
 
         function addRowListeners(row) {
@@ -76,6 +77,8 @@
                 let selectedRow = document.querySelector('.selected-row');
 
                 if (selectedRow) {
+                    selectedRow.querySelector('.id-barang').value = this.getAttribute(
+                        'data-id-barang');
                     selectedRow.querySelector('.nama-barang').value = namaBarang;
                     selectedRow.querySelector('.harga-barang').value = formatRupiah(hargaBarang);
                     selectedRow.querySelector('.harga-barang').setAttribute('data-value',
@@ -119,7 +122,8 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control jumlah-barang" value="1">
+                                        <input type="hidden" class="form-control id-barang" name="ID_Barang[]">
+                                        <input type="number" class="form-control jumlah-barang[]" value="1">
                                     </td>
                                     <td>
                                         <input type="text" class="form-control harga-barang" readonly>
@@ -127,13 +131,17 @@
                                     <td>
                                         <input type="text" class="form-control subtotal-barang" readonly>
                                     </td>
-                                </tr>`;
+                                    </tr>`;
 
             addRowListeners(newRow);
         });
 
         document.querySelectorAll('#tabelBarang tbody tr').forEach(function (row) {
             addRowListeners(row);
+        });
+        document.getElementById('Jumlah_Bayar').addEventListener('input', function (e) {
+            let value = this.value.replace(/\D/g, '');
+            this.value = formatRupiah(value);
         });
     });
 </script>
