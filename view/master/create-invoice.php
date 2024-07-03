@@ -53,32 +53,32 @@ if (isset($_POST['buatInvoice'])) {
 
         if ($success) {
             ?>
-<div class="alert alert-success alert-dismissible" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-    <h6><i class="fas fa-check"></i><b> Invoice berhasil dibuat dan disimpan!</b></h6>
-</div>
-<?php
+            <div class="alert alert-success alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h6><i class="fas fa-check"></i><b> Invoice berhasil dibuat dan disimpan!</b></h6>
+            </div>
+            <?php
         } else {
             ?>
-<div class="alert alert-danger alert-dismissible" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-    <h6><i class="fas fa-ban"></i><b> Gagal menyimpan data detail transaksi.</b></h6>
-</div>
-<?php
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h6><i class="fas fa-ban"></i><b> Gagal menyimpan data detail transaksi.</b></h6>
+            </div>
+            <?php
         }
     } else {
         ?>
-<div class="alert alert-danger alert-dismissible" role="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-    <h6><i class="fas fa-ban"></i><b> Gagal menyimpan data header transaksi.</b></h6>
-</div>
-<?php
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h6><i class="fas fa-ban"></i><b> Gagal menyimpan data header transaksi.</b></h6>
+        </div>
+        <?php
     }
 }
 
@@ -248,20 +248,20 @@ if (isset($_POST['buatInvoice'])) {
                             </thead>
                             <tbody>
                                 <?php while ($data = mysqli_fetch_assoc($ambilCustomer)): ?>
-                                <tr>
-                                    <td><?= $data['Nama_Customer'] ?></td>
-                                    <td><?= $data['Telepon_Customer'] ?></td>
-                                    <td><?= $data['Alamat_Customer'] ?></td>
-                                    <td>
-                                        <a href="#" class="btn btn-primary pilihCustomer"
-                                            data-id-customer="<?= $data['Id_Customer'] ?>"
-                                            data-nama-customer="<?= $data['Nama_Customer'] ?>"
-                                            data-telepon-customer="<?= $data['Telepon_Customer'] ?>"
-                                            data-alamat-customer="<?= $data['Alamat_Customer'] ?>" data-dismiss="modal">
-                                            Pilih
-                                        </a>
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td><?= $data['Nama_Customer'] ?></td>
+                                        <td><?= $data['Telepon_Customer'] ?></td>
+                                        <td><?= $data['Alamat_Customer'] ?></td>
+                                        <td>
+                                            <a href="#" class="btn btn-primary pilihCustomer"
+                                                data-id-customer="<?= $data['Id_Customer'] ?>"
+                                                data-nama-customer="<?= $data['Nama_Customer'] ?>"
+                                                data-telepon-customer="<?= $data['Telepon_Customer'] ?>"
+                                                data-alamat-customer="<?= $data['Alamat_Customer'] ?>" data-dismiss="modal">
+                                                Pilih
+                                            </a>
+                                        </td>
+                                    </tr>
                                 <?php endwhile ?>
                             </tbody>
                         </table>
@@ -292,18 +292,18 @@ if (isset($_POST['buatInvoice'])) {
                             </thead>
                             <tbody>
                                 <?php while ($data = mysqli_fetch_assoc($ambilBarang)): ?>
-                                <tr>
-                                    <td><?= $data['Nama_Barang'] ?></td>
-                                    <td>Rp. <?= ribuan($data['Harga']) ?></td>
-                                    <td>
-                                        <a href="#" class="btn btn-primary pilihBarang"
-                                            data-id-barang="<?= $data['Id_Barang'] ?>"
-                                            data-nama-barang="<?= $data['Nama_Barang'] ?>"
-                                            data-harga-barang="<?= $data['Harga'] ?>" data-dismiss="modal">
-                                            Pilih
-                                        </a>
-                                    </td>
-                                </tr>
+                                    <tr>
+                                        <td><?= $data['Nama_Barang'] ?></td>
+                                        <td>Rp. <?= ribuan($data['Harga']) ?></td>
+                                        <td>
+                                            <a href="#" class="btn btn-primary pilihBarang"
+                                                data-id-barang="<?= $data['Id_Barang'] ?>"
+                                                data-nama-barang="<?= $data['Nama_Barang'] ?>"
+                                                data-harga-barang="<?= $data['Harga'] ?>" data-dismiss="modal">
+                                                Pilih
+                                            </a>
+                                        </td>
+                                    </tr>
                                 <?php endwhile ?>
                             </tbody>
                         </table>
